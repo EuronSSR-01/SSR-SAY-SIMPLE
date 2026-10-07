@@ -1,0 +1,20 @@
+{
+  "name": "ssr-say-simple-marketplace",
+  "interface": {
+    "displayName": "SSR Say Simple"
+  },
+  "plugins": [
+    {
+      "name": "ssr-say-simple",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ssr-say-simple"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

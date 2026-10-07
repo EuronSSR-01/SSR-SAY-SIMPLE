@@ -1,0 +1,29 @@
+SSR-HTML-PLAN-CODEX
+
+Derived from html-plan in anthropics/claude-plugins-community:
+https://github.com/anthropics/claude-plugins-community/tree/f60f0454df3045f724c43c6346ec80bdcc3472b2/html-plan
+Upstream revision: f60f0454df3045f724c43c6346ec80bdcc3472b2
+Retrieved: 2026-10-06 (America/Los_Angeles)
+License: Apache License 2.0; see LICENSE.
+
+Local adaptations, 2026-10-06:
+- Rewrote SKILL.md for Codex, Chinese plans, local previews and existing user authorization.
+- Added Codex UI metadata and a Chinese teaching example.
+- Changed runtime feedback references from Claude to Codex.
+- Accepted Chinese sentence punctuation in the structural linter.
+Other upstream runtime, styles, component reference and scheduled-send example are retained.
+This is a local adaptation, not an official Anthropic or OpenAI product.
+
+Public plugin packaging, 2026-10-06:
+- Packaged as ssr-html-plan-codex 1.0.0, published by EuronSSR-01.
+- Replaced the local conversation quote in the Chinese example with a fictional brief.
+- Added plugin metadata, a GitHub marketplace, and Chinese installation instructions.
+- Updated invocation examples to the plugin-qualified skill name.
+- Removed three trailing-whitespace occurrences in the runtime sources.
+
+Independent SSR-SAY-SIMPLE adaptation, 2026-10-07:
+- Based on EuronSSR-01/SSR-HTML-PLAN-CODEX revision 03d1a78.
+- Added plain-language guidance, bilingual advisory readability checks and interactive consequence teaching example.
+- Replaced heuristic STE claims/modal substitutions with meaning-preserving suggestions.
+- Uses its own plugin and marketplace identifiers; the original repository is unchanged.
+- No video or voice generation. No claim of ASD-STE100 certification or endorsement.

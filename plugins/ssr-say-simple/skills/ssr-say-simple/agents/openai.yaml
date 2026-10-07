@@ -1,0 +1,4 @@
+interface:
+  display_name: "SSR-SAY-SIMPLE"
+  short_description: "用简明中文和交互图解解释复杂方案，展示选项后果并收集批注反馈"
+  default_prompt: "用 $ssr-say-simple:ssr-say-simple 把当前方案做成易懂的交互式 HTML，说明条件和选择的后果，先不修改业务代码。"

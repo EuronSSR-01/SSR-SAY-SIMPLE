@@ -1,0 +1,33 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "ssr-say-simple",
+  "version": "1.0.0",
+  "description": "用简明中文、图解和可操作演示说明复杂方案，支持选择后果、代码依据、批注与离线反馈。",
+  "author": {
+    "name": "EuronSSR-01",
+    "url": "https://github.com/EuronSSR-01"
+  },
+  "repository": "https://github.com/EuronSSR-01/SSR-SAY-SIMPLE",
+  "license": "Apache-2.0",
+  "keywords": [
+    "codex",
+    "plain-language",
+    "html",
+    "chinese",
+    "planning"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "SSR-SAY-SIMPLE",
+        "shortDescription": "把复杂方案讲清楚：简明中文、交互图解、选项后果与批注反馈",
+        "longDescription": "用简明中文、图解和可操作演示说明复杂方案，支持选择后果、代码依据、批注与离线反馈。 基于 SSR-HTML-PLAN-CODEX 的独立插件，无视频生成，无需专用 API Key。",
+        "developerName": "EuronSSR-01",
+        "category": "Productivity",
+        "defaultPrompt": [
+          "用 $ssr-say-simple:ssr-say-simple 把当前方案做成易懂的交互式 HTML，说明关键条件和选择的后果，先不修改业务代码。"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,5 @@
+# Generated plans may contain project code and private feedback.
+*.packed.html
+*.artifact.html
+.DS_Store
+Thumbs.db

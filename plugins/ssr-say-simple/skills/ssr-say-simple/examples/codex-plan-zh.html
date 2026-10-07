@@ -1,0 +1,89 @@
+<!doctype html>
+<!-- Modified for public distribution: replace private request with a fictional brief. -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>餐厅点餐页改造示例</title>
+<link rel="stylesheet" href="../runtime/htmlplan.css">
+<script src="../runtime/htmlplan.js" defer></script>
+<style data-mock-shared>
+  .food-ui { font: 14px/1.6 "Segoe UI", "Microsoft YaHei", sans-serif; color:#29251f; background:#fffaf0; border:1px solid #e7d8c5; border-radius:12px; overflow:hidden; }
+  .food-ui .top { padding:20px; background:#244a3e; color:#fffaf0; }
+  .food-ui .top small { color:#c7dac2; }
+  .food-ui h3 { margin:4px 0; font-size:24px; }
+  .food-ui .tabs { display:flex; gap:10px; padding:14px 16px; border-bottom:1px solid #e7d8c5; }
+  .food-ui .tab { padding:5px 12px; border-radius:20px; background:#efe6d7; }
+  .food-ui .active { background:#244a3e; color:white; }
+  .food-ui .dish { padding:16px; display:grid; grid-template-columns:1fr auto; gap:6px; border-bottom:1px solid #eee4d4; }
+  .food-ui .dish strong { font-size:16px; }
+  .food-ui .dish small { color:#746b5d; }
+  .food-ui .add { grid-column:2; grid-row:1 / 3; align-self:center; padding:6px 13px; border-radius:7px; background:#d77739; color:white; }
+  .food-ui .cart { padding:14px 16px; display:flex; justify-content:space-between; background:#244a3e; color:white; }
+</style>
+</head>
+<body>
+<header>
+  <h1>餐厅点餐页改造示例</h1>
+  <p>SSR-SAY-SIMPLE · 教学演示。菜品、价格和代码均为虚构，未读取或修改餐厅项目。</p>
+  <details class="thread"><summary>需求背景与使用方式</summary>
+    <doc-quote via="prompt" from="虚构示例需求">改造餐厅点餐页，让顾客按分类选菜，并在手机上方便地查看购物车。</doc-quote>
+    <p>展开方案，选择选项，再点右下角 Respond → Copy response，把反馈粘回 Codex。这里的选择仅演示交互。</p>
+  </details>
+</header>
+<main>
+<doc-plan>
+  <doc-claim id="menu">
+    <p>顾客可以按分类浏览菜品并加入购物车。</p>
+    <doc-mock frame="none" w="440" caption="草图：分类、价格和加购入口集中展示。"><template>
+      <div class="food-ui">
+        <div class="top"><small>CHEF TERIYAKI · 界面草图</small><h3>今天，吃点热乎的。</h3><span>现做餐点 · 自取与配送</span></div>
+        <div class="tabs"><span class="tab active" data-ref="category">招牌餐</span><span class="tab">小食</span><span class="tab">饮品</span></div>
+        <div class="dish"><strong>照烧鸡肉饭</strong><small>鸡腿肉 · 米饭 · 时蔬 / $12.80</small><span class="add">＋</span></div>
+        <div class="dish"><strong>香煎三文鱼饭</strong><small>三文鱼 · 米饭 · 时蔬 / $16.80</small><span class="add">＋</span></div>
+        <div class="cart" data-ref="cart"><span>购物车 · 2 件</span><strong>查看订单 →</strong></div>
+      </div>
+    </template></doc-mock>
+    <doc-ask id="theme">
+      <p>你更喜欢哪种配色？</p>
+      <label><input type="radio" name="theme" value="warm" checked> 暖白与深绿 <small>推荐，食物内容更突出</small></label>
+      <label><input type="radio" name="theme" value="minimal"> 黑白极简 <small>减少装饰色</small></label>
+    </doc-ask>
+    <doc-claim>
+      <p>分类切换保留已经选择的菜品。</p>
+      <doc-code title="分类筛选 · 草图 / sketch" lang="js"><script type="text/plain">
+const visibleDishes = dishes.filter(dish => dish.category === activeCategory);
+// 切换 activeCategory 不会重置 cartItems。
+</script></doc-code>
+    </doc-claim>
+  </doc-claim>
+  <doc-claim id="checkout">
+    <p>手机端顾客可以随时查看购物车金额。</p>
+    <doc-mock frame="none" w="360" caption="草图：底部入口显示数量和合计。"><template>
+      <div class="food-ui"><div style="padding:22px 16px;color:#746b5d">菜品列表滚动区域</div><div class="cart"><span>2 件 · $29.60</span><strong>查看购物车</strong></div></div>
+    </template></doc-mock>
+    <doc-ask id="cart-position">
+      <p>购物车入口放在哪里？</p>
+      <label><input type="radio" name="cartPosition" value="bottom" checked> 固定在底部 <small>推荐，方便单手操作</small></label>
+      <label><input type="radio" name="cartPosition" value="header"> 放在顶部 <small>页面底部更简洁</small></label>
+    </doc-ask>
+  </doc-claim>
+  <doc-claim aux="shared">
+    <p>两个入口读取同一份购物车数据。</p>
+    <doc-schema id="cart-shape" lang="ts" title="CartItem · 草图 / sketch" caption="可以点 Edit 修改字段，反馈中会带上差异。"><script type="text/plain">
+type CartItem = {
+  dishId: string;
+  name: string;
+  quantity: number;
+  unitPriceCents: number;
+};
+</script></doc-schema>
+  </doc-claim>
+  <doc-claim aux="scope">
+    <p>本示例仅演示计划审阅功能。</p>
+    <ul><li>不连接支付，不提交订单，不修改业务代码。</li><li>实际项目的文件路径和修改数量须先读代码确认。</li><li>未打开的默认选项不等于同意，复制反馈也不会自动执行改动。</li></ul>
+  </doc-claim>
+</doc-plan>
+</main>
+</body>
+</html>

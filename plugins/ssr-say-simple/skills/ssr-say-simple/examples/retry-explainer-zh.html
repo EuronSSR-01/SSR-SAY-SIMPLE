@@ -1,0 +1,106 @@
+<!doctype html>
+<!-- SSR-SAY-SIMPLE teaching example, 2026-10-07. Fictional data, no real sending. -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>失败后怎样重试</title>
+<link rel="stylesheet" href="../runtime/htmlplan.css">
+<script src="../runtime/htmlplan.js" defer></script>
+<style>
+  .lead {max-width:62ch; color:var(--muted,#666)}
+  .compare {width:100%;border-collapse:collapse;font-size:14px}
+  .compare th,.compare td {padding:12px 10px;text-align:left;border-bottom:1px solid #ddd;vertical-align:top}
+  .compare th {font-weight:600}
+</style>
+<style data-mock-shared>
+  .message {font:14px/1.6 "Segoe UI","Microsoft YaHei",sans-serif;background:#f8f7f2;border:1px solid #dcd9ce;border-radius:12px;padding:20px;color:#232921}
+  .message strong {display:block;font-size:20px;margin:4px 0 10px}
+  .message .label {color:#546b48;font-size:12px;letter-spacing:1px}
+  .message .action {display:inline-block;background:#284b37;color:#fff;border-radius:6px;padding:6px 12px;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <h1>失败后怎样重试</h1>
+  <p class="lead">SSR-SAY-SIMPLE · 交互式教学示例。选一种方案，点状态图，看用户会遇到什么。</p>
+  <details class="thread"><summary>需求、前提与操作方法</summary>
+    <doc-quote via="prompt" from="虚构需求">通知发送失败时，保留通知内容。请比较自动重试与手动重试，让我看到两种方案的区别。</doc-quote>
+    <p>假设发送接口能用通知 ID 去重。失败时不扣费；这些是假设，不是已验证的业务事实。</p>
+    <p>展开第一条方案，切换选项。点击图中的状态查看提示草图；这不会真的发送通知。</p>
+    <p>点 Respond → Copy response，把选择和批注粘回 Codex。页面不会执行计划。</p>
+  </details>
+</header>
+<main>
+<doc-plan>
+  <doc-claim id="retry-plan">
+    <p>发送失败后，系统保留通知并按所选方式重试。</p>
+    <doc-flow caption="共同前提：失败时保留内容，再决定由谁发起重试。"><script type="text/plain">
+failed = 发送失败
+saved = 保留内容
+choice = 选择重试方式
+| failed | saved |
+| . | choice |
+failed -> saved : 保存
+saved -> choice : 决定
+</script></doc-flow>
+    <doc-ask id="retry-choice">
+      <p>失败后由谁发起重试？</p>
+      <label><input type="radio" name="retry" value="manual" checked> 用户手动重试 <small>推荐起点；用户决定时机，但需要再次操作</small></label>
+      <label><input type="radio" name="retry" value="auto"> 系统自动重试 <small>减少操作，但要等待，并需要次数上限</small></label>
+    </doc-ask>
+    <doc-claim id="manual-branch" data-if="retry=manual">
+      <p>用户点击重试后，系统再次发送通知。</p>
+      <doc-machine name="manualSend" caption="手动演示：点 failed、sending、sent，看相应的提示。"><script type="text/plain">
+machine manualSend initial failed
+state failed # 发送失败，等待用户操作。
+state sending # 用户已点击重试，正在发送。
+state sent final # 发送成功。
+| failed | sending | sent |
+failed -click-> sending : 用户点击
+sending -ok-> sent : 成功
+sending -error-> failed : 再次失败
+</script>
+        <div data-state="failed"><doc-mock frame="none" w="360"><template><div class="message"><span class="label">手动重试 · 草图</span><strong>通知未发送</strong><p>内容已保留。你可以稍后重试。</p><span class="action">重试（示意按钮）</span></div></template></doc-mock></div>
+        <div data-state="sending"><doc-mock frame="none" w="360"><template><div class="message"><span class="label">手动重试 · 草图</span><strong>正在发送</strong><p>请等待本次结果。</p></div></template></doc-mock></div>
+        <div data-state="sent"><doc-mock frame="none" w="360"><template><div class="message"><span class="label">手动重试 · 草图</span><strong>通知已发送</strong><p>无需再次操作。</p></div></template></doc-mock></div>
+      </doc-machine>
+      <doc-note>代价：用户离开页面后，通知不会自己重试。</doc-note>
+    </doc-claim>
+    <doc-claim id="auto-branch" data-if="retry=auto">
+      <p>系统每隔五分钟重试，最多重试三次。</p>
+      <doc-machine name="autoSend" caption="自动演示：点 waiting 看等待提示，点 exhausted 看达到上限后的结果。"><script type="text/plain">
+machine autoSend initial waiting
+state waiting # 等待下一次重试。
+state sending # 系统正在重试。
+state sent final # 发送成功，不再重试。
+state exhausted final # 三次重试均失败，停止自动重试。
+| waiting | sending | sent |
+| . | exhausted | . |
+waiting -due-> sending : 五分钟后
+sending -ok-> sent : 成功
+sending -again-> waiting : 失败且未到上限
+sending -limit-> exhausted : 达到上限
+</script>
+        <div data-state="waiting"><doc-mock frame="none" w="360"><template><div class="message"><span class="label">自动重试 · 草图</span><strong>等待重试</strong><p>五分钟后再次尝试。最多重试三次。</p></div></template></doc-mock></div>
+        <div data-state="sending"><doc-mock frame="none" w="360"><template><div class="message"><span class="label">自动重试 · 草图</span><strong>正在自动重试</strong><p>结果出来后更新状态。</p></div></template></doc-mock></div>
+        <div data-state="sent"><doc-mock frame="none" w="360"><template><div class="message"><span class="label">自动重试 · 草图</span><strong>通知已发送</strong><p>系统停止重试。</p></div></template></doc-mock></div>
+        <div data-state="exhausted"><doc-mock frame="none" w="360"><template><div class="message"><span class="label">自动重试 · 草图</span><strong>自动重试已停止</strong><p>三次重试均失败，内容仍保留。</p></div></template></doc-mock></div>
+      </doc-machine>
+      <doc-note>代价：需要后台计时、记录重试次数，并防止重复发送。图展示可能结果，不模拟真实计时或次数。</doc-note>
+    </doc-claim>
+  </doc-claim>
+  <doc-claim id="tradeoffs">
+    <p>两种方案都保留内容，但等待方式和实现成本不同。</p>
+    <doc-mock frame="none" w="440" caption="在同一前提下比较，不把推荐项当成唯一答案。"><template>
+      <table style="width:100%;font:14px/1.6 sans-serif;border-collapse:collapse;color:#29251f;background:#faf9f4"><thead><tr><th style="padding:12px;text-align:left">比较项</th><th>手动</th><th>自动</th></tr></thead><tbody><tr><td style="padding:12px">用户操作</td><td>再次点击</td><td>等待结果</td></tr><tr><td style="padding:12px">后台计时</td><td>不需要</td><td>需要</td></tr><tr><td style="padding:12px">停止条件</td><td>每次返回结果</td><td>成功或达到上限</td></tr></tbody></table>
+    </template></doc-mock>
+  </doc-claim>
+  <doc-claim aux="scope">
+    <p>本页是方案演示，实际发送规则仍需验证。</p>
+    <ul><li>通知 ID、次数和计费规则都是教学假设。</li><li>本页不连接服务器，不读取项目代码。</li><li>未打开的默认选项不代表批准；复制反馈也不会自动实施。</li></ul>
+  </doc-claim>
+</doc-plan>
+</main>
+</body>
+</html>
